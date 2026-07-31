@@ -2,6 +2,13 @@
    UCHIHA ITACHI — scroll-scrubbed frames + mouse-tracked eyes
    ═══════════════════════════════════════════════════════════ */
 
+/* Instant audio buffer priority */
+const bgmAudio = document.getElementById('bgmAudio');
+if (bgmAudio) {
+  bgmAudio.volume = 0.45;
+  bgmAudio.load();
+}
+
 const MAIN_COUNT = 71;
 const EYE_COUNT  = 51;
 const pad = n => String(n).padStart(3, '0');
@@ -48,6 +55,7 @@ Promise.all(jobs).then(() => {
     document.body.classList.add('ready');
     // ensure first paint is correct once fonts/layout settle
     resizeAll();
+    unlockAudio();
     setTimeout(() => { loaderEl.style.display = 'none'; }, 1100);
   }, 420);
 });
@@ -836,7 +844,6 @@ if (!reducedMotion) stormTimer = setTimeout(strike, 1800);
 /* ── sound & audio engine ── */
 const soundToggle = document.getElementById('soundToggle');
 const soundState  = document.getElementById('soundState');
-const bgmAudio    = document.getElementById('bgmAudio');
 const bgmToggle   = document.getElementById('bgmToggle');
 const bgmState    = document.getElementById('bgmState');
 
@@ -869,7 +876,7 @@ async function playBGM() {
   try {
     await bgmAudio.play();
   } catch (err) {
-    console.warn('Autoplay blocked. Sound will start on first click/scroll gesture.', err);
+    console.warn('Autoplay blocked. Sound will start on first user movement or interaction.', err);
   }
 }
 
@@ -916,8 +923,8 @@ if (soundToggle) {
 // Initial play attempt
 playBGM();
 
-// Register unlock listeners across all common user interactions
-['pointerdown', 'mousedown', 'click', 'touchstart', 'keydown', 'wheel', 'scroll'].forEach(evt => {
+// Register unlock listeners across all user movement and interaction events for instant start
+['pointermove', 'mousemove', 'pointerdown', 'mousedown', 'click', 'touchstart', 'keydown', 'wheel', 'scroll'].forEach(evt => {
   window.addEventListener(evt, unlockAudio, { passive: true });
 });
 
